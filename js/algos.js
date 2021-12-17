@@ -102,109 +102,84 @@ function shellsort() {
     }
 }
 
-// function mergesort() {
-//
-// }
-//
-// function merge(){
-//
-// }
+function merge(unsortedArray) {
+    if (unsortedArray.length > 1) {
+        const middle = Math.floor(unsortedArray.length / 2);
+        const nleft = unsortedArray.slice(0, middle);
+        const nright = unsortedArray.slice(middle);
+        let index = 0;
+        let ileft = 0;
+        let iright = 0;
 
-function merge (/*mid, nleft, nright*/) {
-    // if (arrayA.length===0){
-    //     return arrayB;
-    // }else if (arrayB.length===0){
-    //     return arrayA;
-    // } else if (isLess(arrayA[0],arrayB[0])){
-    //     swap(arrayA[0], arrayB[0])
-    //     return arrayA[0]+merge(arrayA[1],arrayB)
-    // } else {
-    //     swap(arrayB[1], arrayA)
-    //     return arrayB[0]+merge(arrayA,arrayB[1])
-    // }
-}
+        merge(nleft);
+        merge(nright);
 
-function mergesort (unsortedArr) {
-    // if(unsortedArr.length<=1){
-    //     return unsortedArr
-    // }else{
-    //     return mergesort(merge(unsortedArr.length/2), merge(unsortedArr.length/2+1))
-    // }
-}
+        while (ileft < nleft.length && iright < nright.length) {
+            if (isLess(
+                csvData.findIndex(e => e.nom_commune === nleft[ileft].nom_commune),
+                csvData.findIndex(e => e.nom_commune === nright[iright].nom_commune))) {
+                unsortedArray[index] = nleft[ileft];
+                ileft++;
+            } else {
+                unsortedArray[index] = nright[iright];
+                iright++;
+            }
+            index++
+        }
 
-// function organize(unsortedArr){
-//     for (let i = 0; i <= unsortedArr.length-1; i++){
-//         toTop(unsortedArr, i);
-//     }
-// }
-//
-// function toTop(unsortedArr, index){
-//     if (index !== 0){
-//         swap(index, index/2)
-//         toTop(unsortedArr, index/2)
-//     }
-// }
-//
-// function toBottom(unsortedArr, item, index){
-//     let f = 2*index+1;
-//     let max = 0
-//     if (isLess(f, item)){
-//         if (unsortedArr[f].dist>unsortedArr[2*index].dist){
-//             max = f;
-//         }else {
-//             max = 2*index;
-//         }
-//     }
-//     else if (unsortedArr[max].dist>unsortedArr[index].dist){
-//         swap(max, index)
-//     }
-// }
-//
-// function heapsort(unsortedArr) {
-//     organize(unsortedArr)
-//     for (let l = 0; l<=unsortedArr.length-1; l--){
-//         swap(0,l)
-//         toBottom(unsortedArr, l,0)
-//     }
-// }
-
-function heapify(arr, n, i)
-{
-    let smallest = i; // Initialize smallest as root
-    let l = 2 * i + 1; // left = 2*i + 1
-    let r = 2 * i + 2; // right = 2*i + 2
-
-    // If left child is smaller than root
-    if (isLess(l,n) && isLess(arr[l], arr[smallest]))
-        smallest = l;
-
-    // If right child is smaller than smallest so far
-    if (isLess(r,n) && isLess(arr[r], arr[smallest]))
-        smallest = r;
-
-    // If smallest is not root
-    if (smallest !== i) {
-        swap(arr, i, smallest);
-
-        // Recursively heapify the affected sub-tree
-        heapify(arr, n, smallest);
+        while (ileft < nleft.length) {
+            unsortedArray[index] = nleft[ileft]
+            ileft++
+            index++
+        }
+        while (iright < nright.length) {
+            unsortedArray[index] = nright[iright]
+            iright++
+            index++
+        }
     }
 }
 
-// main function to do heap sort
-function heapsort(arr, n)
-{
-    // Build heap (rearrange array)
-    for (let i = Math.floor(n / 2 - 1); i >= 0; i--)
-        heapify(arr, n, i);
+function mergesort() {
+    let temp = JSON.parse(JSON.stringify(csvData));
+    merge(temp);
+    for (let i = 0; i <= csvData.length-1; i++) {
+        let index = csvData.findIndex(e => e.nom_commune === temp[i].nom_commune);
+        swap(index, i);
+    }
+}
 
-    // One by one extract an element from heap
+function tas(unsortedArr, n) {
+    for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+        heap(unsortedArr, n, i);
+    }
+}
+
+function heap(unsortedArr, n, i) {
+    let bigger = i;
+    let ileft = 2 * i + 1;
+    let iright = 2 * i + 2;
+
+    if (ileft < n && isLess(bigger, ileft)) {
+        bigger = ileft;
+    }
+
+    if (iright < n && isLess(bigger, iright)) {
+        bigger = iright;
+    }
+
+    if (bigger !== i) {
+        swap(bigger, i);
+        heap(unsortedArr, n, bigger)
+    }
+}
+
+function heapsort() {
+    let n = csvData.length;
+    tas(csvData, n);
     for (let i = n - 1; i >= 0; i--) {
-        // Move current root to end
-        swap(arr, 0, i);
-
-        // call max heapify on the reduced heap
-        heapify(arr, i, 0);
+        swap(i, 0);
+        heap(csvData, i, 0);
     }
 }
 
@@ -252,11 +227,10 @@ function sort(algo) {
             shellsort();
             break;
         case 'merge':
-            console.log(mergesort(csvData.length));
-
+            mergesort();
             break;
         case 'heap':
-            heapsort(csvData, csvData.length-1);
+            heapsort(csvData, csvData.length - 1);
             break;
         case 'quick':
             quicksort(csvData, 0, csvData.length - 1);
